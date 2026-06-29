@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Add company - Armada Sales{% endblock %}
+{% block content %}
+<h1>Add company</h1>
+<form method="post" class="card">
+  <div class="row">
+    <div><label>Company name</label><input name="name" required></div>
+    <div><label>Website</label><input name="website" placeholder="https://"></div>
+  </div>
+  <div class="row">
+    <div>
+      <label>Industry</label>
+      <select name="industry_id">
+        <option value="">-</option>
+        {% for i in industries %}<option value="{{ i.id }}">{{ i.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>Current provider / competitor</label>
+      <select name="current_provider_id">
+        <option value="">Unknown</option>
+        {% for c in competitors %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div><label>City</label><input name="city"></div>
+    <div><label>State</label><input name="state"></div>
+    <div><label>Employee count</label><input name="employee_count" placeholder="e.g. 200-500"></div>
+  </div>
+  <label>Why is this a good fit for Armada?</label>
+  <textarea name="fit_notes" rows="3"></textarea>
+  <div style="margin-top:14px;"><button class="btn" type="submit">Save company</button></div>
+</form>
+{% endblock %}

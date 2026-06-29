@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}{{ company.name }} - Armada Sales{% endblock %}
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center;">
+  <h1>{{ company.name }}</h1>
+  <form method="post" action="{{ url_for('main.company_update_stage', company_id=company.id) }}">
+    <select name="stage" onchange="this.form.submit()">
+      {% for s in stages %}<option value="{{ s }}" {% if s==company.stage %}selected{% endif %}>{{ s }}</option>{% endfor %}
+    </select>
+  </form>
+</div>
+<p class="muted">
+  {{ company.industry.name if company.industry else "No industry set" }} ·
+  {{ company.city or "" }}{% if company.city and company.state %}, {% endif %}{{ company.state or "" }} ·
+  Current provider: {{ company.current_provider.name if company.current_provider else "Unknown" }} ·
+  Source: {{ company.source }}
+  {% if company.website %} · <a class="link" href="{{ company.website }}" target="_blank">{{ company.website }}</a>{% endif %}
+</p>
+{% if company.fit_notes %}<div class="card"><strong>Fit notes:</strong> {{ company.fit_notes }}</div>{% endif %}
+
+<h2>Contacts</h2>
+<div class="card">
+  <table>
+    <tr><th>Name</th><th>Title</th><th>Email</th><th>Phone</th><th>LinkedIn</th><th></th></tr>
+    {% for ct in company.contacts %}
+    <tr>
+      <td>{{ ct.name }}</td><td>{{ ct.title or "-" }}</td><td>{{ ct.email or "-" }}</td><td>{{ ct.phone or "-" }}</td>
+      <td>{% if ct.linkedin_url %}<a class="link" href="{{ ct.linkedin_url }}" target="_blank">profile</a>{% else %}-{% endif %}</td>
+      <td>
+        <form method="post" action="{{ url_for('main.outreach_new') }}" style="display:inline;">
+          <input type="hidden" name="contact_id" value="{{ ct.id }}">
+          <select name="template_id" style="width:auto;display:inline;">
+            <option value="">Blank email</option>
+            {% for t in templates %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}
+          </select>
+          <button class="btn small" type="submit">Draft email</button>
+        </form>
+        <form method="post" action="{{ url_for('main.contact_delete', contact_id=ct.id) }}" style="display:inline;">
+          <button class="btn small danger" type="submit" onclick="return confirm('Delete contact?')">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" class="muted">No contacts yet.</td></tr>
+    {% endfor %}
+  </table>
+  <h3>Add contact</h3>
+  <form method="post" action="{{ url_for('main.contact_new', company_id=company.id) }}" class="row">
+    <div><label>Name</label><input name="name" required></div>
+    <div><label>Title</label><input name="title"></div>
+    <div><label>Email</label><input name="email" type="email"></div>
+    <div><label>Phone</label><input name="phone"></div>
+    <div><label>LinkedIn URL</label><input name="linkedin_url"></div>
+    <div style="align-self:flex-end;"><button class="btn" type="submit">Add</button></div>
+  </form>
+</div>
+
+<h2>Competitor / renewal signals</h2>
+<div class="card">
+  <table>
+    <tr><th>Competitor</th><th>Signal type</th><th>Expected date</th><th>Confidence</th><th>Source</th><th></th></tr>
+    {% for s in company.signals %}
+    <tr>
+      <td>{{ s.competitor.name if s.competitor else "-" }}</td>
+      <td>{{ s.signal_type }}</td>
+      <td>{{ s.expected_date or "-" }}</td>
+      <td>{{ s.confidence }}</td>
+      <td>{% if s.source_url %}<a class="link" href="{{ s.source_url }}" target="_blank">link</a>{% else %}-{% endif %}</td>
+      <td><form method="post" action="{{ url_for('main.signal_delete', signal_id=s.id) }}"><button class="btn small danger" type="submit">Delete</button></form></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" class="muted">No signals logged. Add what you find from news, RFPs, LinkedIn, or job postings.</td></tr>
+    {% endfor %}
+  </table>
+  <h3>Add signal</h3>
+  <form method="post" action="{{ url_for('main.signal_new', company_id=company.id) }}" class="row">
+    <div>
+      <label>Competitor</label>
+      <select name="competitor_id"><option value="">-</option>{% for c in competitors %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}</select>
+    </div>
+    <div>
+      <label>Signal type</label>
+      <select name="signal_type">{% for t in signal_types %}<option value="{{ t }}">{{ t }}</option>{% endfor %}</select>
+    </div>
+    <div><label>Expected/known date</label><input type="date" name="expected_date"></div>
+    <div>
+      <label>Confidence</label>
+      <select name="confidence"><option>Low</option><option selected>Medium</option><option>High</option></select>
+    </div>
+    <div><label>Source URL</label><input name="source_url" placeholder="https://"></div>
+    <div style="flex:2;"><label>Notes</label><input name="notes"></div>
+    <div style="align-self:flex-end;"><button class="btn" type="submit">Add</button></div>
+  </form>
+</div>
+
+<h2>Outreach history</h2>
+<div class="card">
+  <table>
+    <tr><th>Contact</th><th>Subject</th><th>Status</th><th>Sent</th><th>Next follow-up</th></tr>
+    {% for o in company.outreach %}
+    <tr>
+      <td><a class="link" href="{{ url_for('main.outreach_detail', outreach_id=o.id) }}">{{ o.contact.name }}</a></td>
+      <td>{{ o.subject }}</td>
+      <td><span class="badge">{{ o.status }}</span></td>
+      <td>{{ o.sent_at.strftime('%Y-%m-%d') if o.sent_at else "-" }}</td>
+      <td>{{ o.next_follow_up or "-" }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" class="muted">No outreach drafted yet.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

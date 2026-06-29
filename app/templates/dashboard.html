@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Armada Sales{% endblock %}
+{% block content %}
+<h1>Pipeline</h1>
+<div class="stage-grid">
+  {% for stage in stages %}
+  <a class="stage-pill" href="{{ url_for('main.companies_list', stage=stage) }}" style="text-decoration:none;color:inherit;">
+    <div class="count">{{ stage_counts[stage] }}</div>
+    <div class="muted">{{ stage }}</div>
+  </a>
+  {% endfor %}
+</div>
+
+<h2 style="margin-top:28px;">Renewal/competitor signals in the next 90 days</h2>
+<div class="card">
+  {% if upcoming_signals %}
+  <table>
+    <tr><th>Company</th><th>Competitor</th><th>Signal</th><th>Expected date</th><th>Confidence</th></tr>
+    {% for s in upcoming_signals %}
+    <tr>
+      <td><a class="link" href="{{ url_for('main.company_detail', company_id=s.company_id) }}">{{ s.company.name }}</a></td>
+      <td>{{ s.competitor.name if s.competitor else "-" }}</td>
+      <td>{{ s.signal_type }}</td>
+      <td>{{ s.expected_date }}</td>
+      <td>{{ s.confidence }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="muted">No renewal signals logged yet. Add them from a company's detail page as you research.</p>
+  {% endif %}
+</div>
+
+<h2>Recent outreach</h2>
+<div class="card">
+  {% if recent_outreach %}
+  <table>
+    <tr><th>Contact</th><th>Company</th><th>Subject</th><th>Status</th><th>Sent</th></tr>
+    {% for o in recent_outreach %}
+    <tr>
+      <td><a class="link" href="{{ url_for('main.outreach_detail', outreach_id=o.id) }}">{{ o.contact.name }}</a></td>
+      <td>{{ o.company.name }}</td>
+      <td>{{ o.subject }}</td>
+      <td><span class="badge">{{ o.status }}</span></td>
+      <td>{{ o.sent_at.strftime('%Y-%m-%d') if o.sent_at else "-" }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="muted">No outreach yet. Open a company, add a contact, and draft an email.</p>
+  {% endif %}
+</div>
+{% endblock %}

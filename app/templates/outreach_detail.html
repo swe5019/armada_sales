@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Outreach - Armada Sales{% endblock %}
+{% block content %}
+<h1>Email to {{ outreach.contact.name }} ({{ outreach.company.name }})</h1>
+<p class="muted">Status: <span class="badge">{{ outreach.status }}</span>
+  {% if outreach.sent_at %} · Sent {{ outreach.sent_at.strftime('%Y-%m-%d %H:%M') }}{% endif %}</p>
+
+<form method="post" action="{{ url_for('main.outreach_edit', outreach_id=outreach.id) }}" class="card">
+  <label>Subject</label>
+  <input name="subject" value="{{ outreach.subject }}">
+  <label>Body</label>
+  <textarea name="body" rows="14">{{ outreach.body }}</textarea>
+  <div style="margin-top:12px; display:flex; gap:8px;">
+    <button class="btn secondary" type="submit">Save draft</button>
+  </div>
+</form>
+
+<div class="card">
+  <h3>Send</h3>
+  <p class="muted">To: {{ outreach.contact.email or "(no email on file)" }}</p>
+  <form method="post" action="{{ url_for('main.outreach_send', outreach_id=outreach.id) }}" style="display:inline;">
+    <button class="btn" type="submit">Send via SMTP</button>
+  </form>
+  <form method="post" action="{{ url_for('main.outreach_mark_sent', outreach_id=outreach.id) }}" style="display:inline;">
+    <button class="btn secondary" type="submit">I sent this manually — mark as sent</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>Update status</h3>
+  <form method="post" action="{{ url_for('main.outreach_update_status', outreach_id=outreach.id) }}" class="row">
+    <div>
+      <label>Status</label>
+      <select name="status">
+        {% for s in ["Draft","Sent","Opened","Replied","Bounced"] %}
+        <option value="{{ s }}" {% if s==outreach.status %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div><label>Next follow-up date</label><input type="date" name="next_follow_up" value="{{ outreach.next_follow_up or '' }}"></div>
+    <div style="align-self:flex-end;"><button class="btn" type="submit">Update</button></div>
+  </form>
+</div>
+
+<p><a class="link" href="{{ url_for('main.company_detail', company_id=outreach.company_id) }}">&larr; Back to {{ outreach.company.name }}</a></p>
+{% endblock %}

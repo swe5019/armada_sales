@@ -1,0 +1,81 @@
+# Armada Sales — Cold Outreach & Pipeline Tracker
+
+A small Flask app to track prospects, contacts, competitor-contract signals,
+and cold email outreach for Armada Supply Chain Solutions (freight,
+warehousing, redistribution) targeting manufacturers, retailers, food &
+beverage, distributors, importers, and consumer products companies.
+
+## What this does
+
+- **Pipeline tracking**: companies move through stages (New → Researching →
+  Contacted → Engaged → Replied → Warm Lead → Meeting Set → Customer / Lost).
+- **Contacts** per company with email/phone/LinkedIn.
+- **Competitor signals**: log evidence that a company's relationship with a
+  competitor (C.H. Robinson, XPO, J.B. Hunt, Ryder, DHL Supply Chain, GXO,
+  Lineage, Americold, NFI, Kenco, etc. — pre-seeded, editable) may be up for
+  review: a known renewal date, an RFP/bid posting, a leadership change, a
+  hiring spike for logistics/warehouse roles, or a news mention. The
+  dashboard surfaces anything due in the next 90 days.
+- **Email templates** with merge fields (`{{first_name}}`, `{{company_name}}`,
+  `{{industry}}`, `{{competitor_name}}`) and a per-contact composer that logs
+  status (Draft/Sent/Opened/Replied/Bounced) and next follow-up date.
+- **CSV import** for lead lists you already have or source elsewhere.
+- **Apollo.io search** (optional) to pull real companies by industry keyword
+  directly into your pipeline.
+- **SMTP send** (optional) to send straight from the app via a Gmail app
+  password, or just mark emails sent if you send manually from your own inbox.
+
+## Why there's no built-in "list of leads"
+
+There is no public database of private commercial contract expiration dates
+between companies and their freight/warehousing providers — that information
+isn't published anywhere I can query for you. Real prospecting in this space
+comes from a few legitimate channels:
+
+- **Apollo.io / similar B2B databases** — real companies + verified contacts,
+  filterable by industry and size. Wired up via `APOLLO_API_KEY`.
+- **Your own lists** — trade show contacts, LinkedIn Sales Navigator exports,
+  referrals — import via CSV (`sample_leads.csv` shows the expected columns).
+- **Public signals you log yourself** — RFP/bid boards, local business news,
+  LinkedIn "open to work"/hiring posts for logistics roles, leadership
+  changes, press releases about expansions. The Signals feature exists to
+  capture these as you find them, with a date + confidence + source link.
+
+## Setup
+
+```bash
+pip install -r requirements.txt
+cp .env.example .env   # fill in keys you have; all are optional except SECRET_KEY
+python run.py
+```
+
+Visit http://127.0.0.1:5000
+
+The first run creates `armada_sales.db` (SQLite) and seeds industries,
+known competitors, and starter email templates.
+
+### Optional: Apollo.io prospect search
+
+Get a free-tier key at apollo.io, set `APOLLO_API_KEY` in `.env`, then use
+"Find Prospects" in the nav to search by industry keyword and add real
+companies straight into your pipeline.
+
+### Optional: send email from the app
+
+Generate a Gmail "app password" at
+https://myaccount.google.com/apppasswords, set `SMTP_USERNAME` and
+`SMTP_PASSWORD` in `.env`. Otherwise, draft in the app and send manually from
+your own inbox, then click "mark as sent" to keep tracking accurate.
+
+## Project layout
+
+```
+app/
+  models.py        Company, Contact, Signal, Outreach, EmailTemplate, Industry, Competitor
+  routes.py         All views
+  integrations.py   Apollo.io search + SMTP send (both optional/pluggable)
+  seed.py           Seeds industries, competitors, starter templates
+  templates/        Jinja HTML
+run.py              Entrypoint
+sample_leads.csv    CSV import template
+```

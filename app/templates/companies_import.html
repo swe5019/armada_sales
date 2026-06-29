@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Import CSV - Armada Sales{% endblock %}
+{% block content %}
+<h1>Import companies from CSV</h1>
+<div class="card">
+  <p class="muted">
+    Columns supported: <code>company_name, website, industry, city, state, employee_count, notes,
+    contact_name, contact_title, contact_email, contact_phone, contact_linkedin</code><br>
+    Only <code>company_name</code> is required. <code>industry</code> should match one of: Manufacturers,
+    Retailers, Food &amp; Beverage, Distributors, Importers, Consumer Products.
+  </p>
+  <form method="post" enctype="multipart/form-data">
+    <input type="file" name="csv_file" accept=".csv" required>
+    <div style="margin-top:14px;"><button class="btn" type="submit">Import</button></div>
+  </form>
+</div>
+{% endblock %}

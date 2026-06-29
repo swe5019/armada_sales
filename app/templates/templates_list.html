@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Email Templates - Armada Sales{% endblock %}
+{% block content %}
+<h1>Email templates</h1>
+<p class="muted">Merge fields available: <code>{{ '{{first_name}}' }}</code>, <code>{{ '{{company_name}}' }}</code>,
+  <code>{{ '{{industry}}' }}</code>, <code>{{ '{{competitor_name}}' }}</code>, <code>{{ '{{your_name}}' }}</code></p>
+
+<div class="card">
+  <table>
+    <tr><th>Name</th><th>Subject</th><th></th></tr>
+    {% for t in templates %}
+    <tr>
+      <td>{{ t.name }}</td>
+      <td>{{ t.subject }}</td>
+      <td><form method="post" action="{{ url_for('main.template_delete', template_id=t.id) }}"><button class="btn small danger" type="submit">Delete</button></form></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="card">
+  <h3>New template</h3>
+  <form method="post" action="{{ url_for('main.template_new') }}">
+    <label>Name</label><input name="name" required>
+    <label>Subject</label><input name="subject" required>
+    <label>Body</label><textarea name="body" rows="8" required></textarea>
+    <div style="margin-top:12px;"><button class="btn" type="submit">Save template</button></div>
+  </form>
+</div>
+{% endblock %}

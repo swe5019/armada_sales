@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Find Prospects - Armada Sales{% endblock %}
+{% block content %}
+<h1>Find prospects (Apollo.io)</h1>
+<div class="card">
+  <p class="muted">
+    Requires an Apollo.io API key in your <code>.env</code> (<code>APOLLO_API_KEY</code>). Free tier available
+    at apollo.io. Search by industry keyword to find real companies matching Armada's target verticals
+    (manufacturers, retailers, food &amp; beverage, distributors, importers, consumer products).
+  </p>
+  <form method="post" class="row">
+    <div><label>Keyword</label><input name="keywords" placeholder="e.g. food and beverage manufacturer" required></div>
+    <div><label>Location (optional)</label><input name="locations" placeholder="e.g. Texas, US"></div>
+    <div style="align-self:flex-end;"><button class="btn" type="submit">Search</button></div>
+  </form>
+</div>
+
+{% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+
+{% if results %}
+<div class="card">
+  <table>
+    <tr><th>Name</th><th>Website</th><th>Location</th><th>Employees</th><th></th></tr>
+    {% for r in results %}
+    <tr>
+      <td>{{ r.name }}</td>
+      <td>{{ r.website or "-" }}</td>
+      <td>{{ r.city or "" }}{% if r.city and r.state %}, {% endif %}{{ r.state or "" }}</td>
+      <td>{{ r.employee_count or "-" }}</td>
+      <td>
+        <form method="post" action="{{ url_for('main.prospects_add') }}">
+          <input type="hidden" name="name" value="{{ r.name }}">
+          <input type="hidden" name="website" value="{{ r.website or '' }}">
+          <input type="hidden" name="city" value="{{ r.city or '' }}">
+          <input type="hidden" name="state" value="{{ r.state or '' }}">
+          <input type="hidden" name="employee_count" value="{{ r.employee_count or '' }}">
+          <button class="btn small" type="submit">Add to pipeline</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+{% endblock %}
