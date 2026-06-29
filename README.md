@@ -41,6 +41,27 @@ comes from a few legitimate channels:
   changes, press releases about expansions. The Signals feature exists to
   capture these as you find them, with a date + confidence + source link.
 
+## Deploying to a real URL (Render.com, free tier)
+
+1. Push this repo to GitHub (already done if you're reading this from the repo).
+2. Go to https://render.com, sign up/log in, click **New > Blueprint**, and
+   connect this GitHub repo. Render will detect `render.yaml` and configure
+   the service automatically.
+3. On the env var setup screen, fill in `APOLLO_API_KEY` / `SMTP_USERNAME` /
+   `SMTP_PASSWORD` if you have them (all optional — leave blank to skip).
+4. Click **Apply**. After the build finishes you'll get a URL like
+   `https://armada-sales.onrender.com` you can open from any device.
+
+**Two things to know about the free tier:**
+- The service spins down after ~15 min idle and takes ~30-60s to wake up on
+  the next visit — fine for solo use, just expect a short delay sometimes.
+- The free tier's disk is **not persistent across deploys** — your SQLite
+  database (companies/contacts/signals) can reset when you push a new commit
+  or redeploy. For a few dozen leads that's a minor annoyance (just re-run
+  `seed_initial_prospects.py`); if that becomes a problem, upgrade to a paid
+  Render plan with a persistent disk (~$7/mo) or swap SQLite for Render's
+  free Postgres add-on — ask me and I'll wire it up.
+
 ## Starter prospects (already loaded)
 
 `seed_initial_prospects.py` loads 3 real, web-researched companies with
