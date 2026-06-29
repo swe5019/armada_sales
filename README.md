@@ -41,6 +41,27 @@ comes from a few legitimate channels:
   changes, press releases about expansions. The Signals feature exists to
   capture these as you find them, with a date + confidence + source link.
 
+## Starter prospects (already loaded)
+
+`seed_initial_prospects.py` loads 3 real, web-researched companies with
+verified public signals as a starting pipeline:
+
+- **Border States** (Fargo, ND) — opening its largest-ever distribution
+  center (300,000+ sq ft) fall 2026; named contacts Tony Serati (VP Supply
+  Chain Strategy) and James Sipe (EVP Supply Chain).
+- **Supply Technologies** (Independence, OH) — new 375,000 sq ft US
+  distribution center opening July 2026.
+- **ofi / Olam Food Ingredients** — new 574,000 sq ft East Coast DC opened
+  Feb 2026 in East Greenwich Township, NJ.
+
+Contact emails for the latter two aren't public — use Apollo.io or LinkedIn
+to find the right person once you've confirmed the company is worth pursuing.
+Run it after first `python run.py` creates the database:
+
+```bash
+python seed_initial_prospects.py
+```
+
 ## Setup
 
 ```bash
